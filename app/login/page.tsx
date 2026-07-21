@@ -1,5 +1,6 @@
 'use client'
 
+import { Suspense } from 'react'
 import { useState, useEffect } from 'react'
 import Link from 'next/link'
 import { useRouter, useSearchParams } from 'next/navigation'
@@ -7,7 +8,7 @@ import { createClient } from '../../lib/supabase/client'
 import Header from '../components/Header'
 import Footer from '../components/Footer'
 
-export default function LoginPage() {
+function LoginContent() {
   const router = useRouter()
   const searchParams = useSearchParams()
   const redirectTo = searchParams.get('redirect') || '/'
@@ -48,14 +49,12 @@ export default function LoginPage() {
       }
 
       if (data.user) {
-        // Check if email is confirmed
         if (!data.user.email_confirmed_at) {
           setError('Please verify your email first. Check your inbox.')
           setLoading(false)
           return
         }
 
-        // ✅ Redirect to HOME page (not dashboard)
         router.push('/')
       }
     } catch (error) {
@@ -65,7 +64,6 @@ export default function LoginPage() {
     setLoading(false)
   }
 
-  // Handle forgot password
   const handleResetPassword = async (e: React.FormEvent) => {
     e.preventDefault()
     setError('')
@@ -199,7 +197,6 @@ export default function LoginPage() {
             </button>
           </form>
 
-          {/* Reset Password Form */}
           <div id="reset-form" className="hidden mt-6 p-4 bg-gray-50 rounded-xl border border-gray-200">
             <h3 className="text-sm font-semibold text-gray-700 mb-3">Reset Password</h3>
             <form onSubmit={handleResetPassword} className="space-y-3">
@@ -244,5 +241,17 @@ export default function LoginPage() {
       </div>
       <Footer />
     </>
+  )
+}
+
+export default function LoginPage() {
+  return (
+    <Suspense fallback={
+      <div className="flex items-center justify-center min-h-[60vh]">
+        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600"></div>
+      </div>
+    }>
+      <LoginContent />
+    </Suspense>
   )
 }
