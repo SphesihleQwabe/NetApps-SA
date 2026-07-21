@@ -1,20 +1,29 @@
 'use client'
 
-import { useEffect, useState } from 'react'
+import { Suspense } from 'react'
 import { useSearchParams } from 'next/navigation'
 import Link from 'next/link'
-import { CheckCircle, Package, ArrowRight } from 'lucide-react'
+import { CheckCircle, Package, ArrowRight, Loader2 } from 'lucide-react'
+import { createClient } from '../../../lib/supabase/client'
 
-export default function PaymentSuccessPage() {
+function SuccessContent() {
   const searchParams = useSearchParams()
-  const [orderId, setOrderId] = useState<string | null>(null)
+  const supabase = createClient()
+  const paymentId = searchParams.get('m_payment_id')
 
-  useEffect(() => {
-    const paymentId = searchParams.get('m_payment_id')
-    if (paymentId) {
-      setOrderId(paymentId)
-    }
-  }, [searchParams])
+  // Update order status to paid
+  if (paymentId) {
+    supabase
+      .from('orders')
+      .update({
+        payment_status: 'paid',
+        status: 'processing'
+      })
+      .eq('id', paymentId)
+      .then(() => {
+        console.log('Order updated successfully')
+      })
+  }
 
   return (
     <div className="max-w-2xl mx-auto py-12 px-4">
@@ -31,21 +40,19 @@ export default function PaymentSuccessPage() {
           Thank you for your order. Your payment has been confirmed.
         </p>
 
-        {orderId && (
+        {paymentId && (
           <p className="text-sm text-gray-500 mb-6">
-            Order ID: <span className="font-mono font-medium">{orderId}</span>
+            Order ID: <span className="font-mono font-medium">{paymentId}</span>
           </p>
         )}
 
         <div className="flex flex-col sm:flex-row gap-4 justify-center">
-          {orderId && (
-            <Link href={`/orders/${orderId}`}>
-              <button className="flex items-center gap-2 bg-blue-600 text-white px-6 py-3 rounded-lg hover:bg-blue-700 transition">
-                <Package className="w-5 h-5" />
-                View Order
-              </button>
-            </Link>
-          )}
+          <Link href="/dashboard">
+            <button className="flex items-center gap-2 bg-blue-600 text-white px-6 py-3 rounded-lg hover:bg-blue-700 transition">
+              <Package className="w-5 h-5" />
+              View My Orders
+            </button>
+          </Link>
           <Link href="/">
             <button className="flex items-center gap-2 border border-gray-300 text-gray-700 px-6 py-3 rounded-lg hover:bg-gray-50 transition">
               Continue Shopping
@@ -55,5 +62,17 @@ export default function PaymentSuccessPage() {
         </div>
       </div>
     </div>
+  )
+}
+
+export default function PaymentSuccessPage() {
+  return (
+    <Suspense fallback={
+      <div className="flex items-center justify-center min-h-[60vh]">
+        <Loader2 className="w-12 h-12 text-blue-600 animate-spin" />
+      </div>
+    }>
+      <SuccessContent />
+    </Suspense>
   )
 }
