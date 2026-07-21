@@ -1,9 +1,10 @@
 'use client'
 
+import { Suspense } from 'react'
 import { useState } from 'react'
 import { useSearchParams, useRouter } from 'next/navigation'
 
-export default function VerifyOTPPage() {
+function VerifyOTPContent() {
   const searchParams = useSearchParams()
   const router = useRouter()
   const email = searchParams.get('email') || ''
@@ -97,5 +98,17 @@ export default function VerifyOTPPage() {
         </div>
       </div>
     </div>
+  )
+}
+
+export default function VerifyOTPPage() {
+  return (
+    <Suspense fallback={
+      <div className="min-h-screen flex items-center justify-center bg-gray-50">
+        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600"></div>
+      </div>
+    }>
+      <VerifyOTPContent />
+    </Suspense>
   )
 }
