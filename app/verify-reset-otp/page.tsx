@@ -1,5 +1,6 @@
 'use client'
 
+import { Suspense } from 'react'
 import { useState, useEffect, useRef } from 'react'
 import { useSearchParams, useRouter } from 'next/navigation'
 import { createClient } from '../../lib/supabase/client'
@@ -7,7 +8,7 @@ import Link from 'next/link'
 import Header from '../components/Header'
 import Footer from '../components/Footer'
 
-export default function VerifyResetOTPPage() {
+function VerifyResetOTPContent() {
   const searchParams = useSearchParams()
   const router = useRouter()
   const email = searchParams.get('email') || ''
@@ -316,5 +317,17 @@ export default function VerifyResetOTPPage() {
       </div>
       <Footer />
     </>
+  )
+}
+
+export default function VerifyResetOTPPage() {
+  return (
+    <Suspense fallback={
+      <div className="flex items-center justify-center min-h-[60vh]">
+        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600"></div>
+      </div>
+    }>
+      <VerifyResetOTPContent />
+    </Suspense>
   )
 }
