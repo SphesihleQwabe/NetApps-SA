@@ -3,7 +3,7 @@
 import { useEffect, useState } from 'react'
 import { useSearchParams } from 'next/navigation'
 import Link from 'next/link'
-import { CheckCircle, Package, ArrowRight, Loader2 } from 'lucide-react'
+import { CheckCircle, Package, ArrowRight, Loader2, XCircle } from 'lucide-react'
 import { createClient } from '../../../lib/supabase/client'
 
 export default function PaymentSuccessPage() {
@@ -15,11 +15,25 @@ export default function PaymentSuccessPage() {
 
   useEffect(() => {
     async function handlePaymentSuccess() {
-      const paymentId = searchParams.get('m_payment_id')
-      console.log('Payment ID from URL:', paymentId)
+      // Try to get order ID from URL
+      let paymentId = searchParams.get('m_payment_id')
       
+      console.log('🔍 URL params:', Object.fromEntries(searchParams.entries()))
+      console.log('🔍 Payment ID from URL:', paymentId)
+
+      // If no payment ID in URL, try to get from localStorage
       if (!paymentId) {
-        setError('No payment ID found')
+        const savedOrderId = localStorage.getItem('pending_order_id')
+        console.log('🔍 Order ID from localStorage:', savedOrderId)
+        
+        if (savedOrderId) {
+          paymentId = savedOrderId
+          localStorage.removeItem('pending_order_id')
+        }
+      }
+
+      if (!paymentId) {
+        setError('No payment ID found. Please check your email for order confirmation.')
         setLoading(false)
         return
       }
@@ -36,15 +50,15 @@ export default function PaymentSuccessPage() {
           })
           .eq('id', paymentId)
 
-        // 🔥 GET ORDER ITEMS
+        // Get order items
         const { data: orderItems } = await supabase
           .from('order_items')
           .select('*')
           .eq('order_id', paymentId)
 
-        console.log('Order items:', orderItems)
+        console.log('📦 Order items:', orderItems)
 
-        // 🔥 DEDUCT STOCK FOR EACH PRODUCT
+        // Deduct stock for each product
         for (const item of orderItems || []) {
           const { data: product } = await supabase
             .from('products')
@@ -73,7 +87,7 @@ export default function PaymentSuccessPage() {
         setLoading(false)
 
       } catch (err) {
-        console.error('Error processing payment:', err)
+        console.error('❌ Error processing payment:', err)
         setError('Payment confirmed but stock update failed')
         setLoading(false)
       }
@@ -154,6 +168,3 @@ export default function PaymentSuccessPage() {
     </div>
   )
 }
-
-// Import XCircle for error state
-import { XCircle } from 'lucide-react'
