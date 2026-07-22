@@ -3,6 +3,10 @@
 @tailwind utilities;
 
 @layer base {
+  * {
+    border-color: #e5e7eb;
+  }
+  
   html {
     scroll-behavior: smooth;
     -webkit-text-size-adjust: 100%;
@@ -14,49 +18,23 @@
     font-size: 16px;
     line-height: 1.5;
   }
-  
-  img, video, iframe {
-    max-width: 100%;
-    height: auto;
-  }
 }
 
 @layer components {
   .container-custom {
-    width: 100%;
-    max-width: 1280px;
-    margin-left: auto;
-    margin-right: auto;
-    padding-left: 1rem;
-    padding-right: 1rem;
+    @apply max-w-7xl mx-auto px-4 sm:px-6 lg:px-8;
   }
   
-  @media (min-width: 640px) {
-    .container-custom {
-      padding-left: 1.5rem;
-      padding-right: 1.5rem;
-    }
+  .btn-primary {
+    @apply bg-blue-600 hover:bg-blue-700 text-white px-6 py-3 rounded-lg font-medium transition;
   }
   
-  @media (min-width: 1024px) {
-    .container-custom {
-      padding-left: 2rem;
-      padding-right: 2rem;
-    }
+  .btn-outline {
+    @apply border-2 border-blue-600 text-blue-600 hover:bg-blue-600 hover:text-white px-6 py-3 rounded-lg font-medium transition;
   }
   
-  .card-responsive {
-    background-color: white;
-    border-radius: 0.75rem;
-    padding: 1rem;
-    box-shadow: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
-    border: 1px solid #f3f4f6;
-  }
-  
-  @media (min-width: 640px) {
-    .card-responsive {
-      padding: 1.5rem;
-    }
+  .card {
+    @apply bg-white rounded-xl shadow-sm border border-gray-100 overflow-hidden;
   }
 }
 
