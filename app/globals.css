@@ -3,11 +3,6 @@
 @tailwind utilities;
 
 @layer base {
-  /* Reset and base styles */
-  * {
-    @apply border-border;
-  }
-  
   html {
     @apply scroll-smooth antialiased;
     -webkit-text-size-adjust: 100%;
@@ -17,6 +12,11 @@
     @apply bg-gray-50 text-gray-900;
     font-size: 16px;
     line-height: 1.5;
+  }
+  
+  /* Fix for border-border error - use real border color instead */
+  * {
+    @apply border-gray-200;
   }
   
   /* Make everything responsive */
