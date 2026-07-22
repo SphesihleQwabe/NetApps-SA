@@ -52,17 +52,15 @@ export default function PayFastButton({
     setError(null)
 
     try {
-      // STEP 1: Create order first
+      // STEP 1: Create order
       const orderNumber = 'NA-' + Date.now().toString().slice(-8)
 
-      // Get user ID
       const { data: userData } = await supabase
         .from('users')
         .select('id')
         .eq('email', email)
         .single()
 
-      // Save order
       const { data: orderData, error: orderError } = await supabase
         .from('orders')
         .insert({
@@ -105,6 +103,10 @@ export default function PayFastButton({
       await supabase
         .from('order_items')
         .insert(orderItems)
+
+      // 🔥 SAVE ORDER ID TO localStorage BEFORE REDIRECT
+      localStorage.setItem('pending_order_id', orderData.id)
+      console.log('💾 Saved order ID to localStorage:', orderData.id)
 
       // STEP 2: Initiate PayFast payment
       const response = await fetch('/api/payfast/initiate', {
