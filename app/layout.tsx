@@ -28,6 +28,8 @@ export default function RootLayout({
   return (
     <html lang="en">
       <head>
+        {/* ✅ ADD THIS VIEWPORT META TAG FOR MOBILE */}
+        <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=yes" />
         <link rel="icon" type="image/png" sizes="32x32" href="/favicon.png" />
         <link rel="icon" type="image/png" sizes="64x64" href="/favicon.png" />
         <link rel="apple-touch-icon" sizes="180x180" href="/favicon.png" />

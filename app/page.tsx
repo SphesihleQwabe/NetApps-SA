@@ -76,7 +76,7 @@ export default function Home() {
     setCurrentSlide((prev) => (prev - 1 + Math.min(products.length, 4)) % Math.min(products.length, 4))
   }
 
-  // ✅ SLIDER PRODUCTS - Different from grid (first 4 in-stock products with discounts)
+  // Slider Products (first 4 in-stock products with discounts)
   const sliderProducts = products
     .filter(p => p.stock_quantity > 0)
     .slice(0, 4)
@@ -91,7 +91,7 @@ export default function Home() {
       }
     })
 
-  // ✅ FEATURED PRODUCTS - Different from slider (next 8 products)
+  // Featured Products (next 8 products)
   const featuredProducts = products.slice(4, 12)
 
   if (loading) {
@@ -123,51 +123,51 @@ export default function Home() {
             />
           </div>
 
-          <div className="relative max-w-7xl mx-auto px-4 py-12 md:py-16 z-10">
+          <div className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 sm:py-12 md:py-16 z-10">
             {/* Header */}
-            <div className="flex items-center justify-between mb-6">
-              <div>
-                <div className="flex items-center gap-2">
-                  <Zap className="w-5 h-5 text-yellow-400" />
-                  <h2 className="text-xl md:text-2xl font-bold text-white">🔥 Limited Time Offers</h2>
+            <div className="flex flex-col sm:flex-row items-center justify-between gap-3 mb-4 sm:mb-6">
+              <div className="text-center sm:text-left">
+                <div className="flex items-center gap-2 justify-center sm:justify-start">
+                  <Zap className="w-4 h-4 sm:w-5 sm:h-5 text-yellow-400" />
+                  <h2 className="text-lg sm:text-xl md:text-2xl font-bold text-white">🔥 Limited Time Offers</h2>
                 </div>
-                <p className="text-blue-100 text-sm">Special discounts on selected items</p>
+                <p className="text-blue-100 text-xs sm:text-sm">Special discounts on selected items</p>
               </div>
               <div className="flex items-center gap-2">
                 <button 
                   onClick={prevSlide}
                   className="p-2 bg-white/20 rounded-full hover:bg-white/30 transition"
                 >
-                  <ChevronLeft className="w-5 h-5" />
+                  <ChevronLeft className="w-4 h-4 sm:w-5 sm:h-5" />
                 </button>
                 <button 
                   onClick={nextSlide}
                   className="p-2 bg-white/20 rounded-full hover:bg-white/30 transition"
                 >
-                  <ChevronRight className="w-5 h-5" />
+                  <ChevronRight className="w-4 h-4 sm:w-5 sm:h-5" />
                 </button>
               </div>
             </div>
 
-            {/* Slider */}
-            <div className="relative overflow-hidden rounded-2xl">
+            {/* Slider - Mobile Optimized */}
+            <div className="relative overflow-hidden rounded-xl sm:rounded-2xl">
               <div 
                 className="flex transition-transform duration-700 ease-in-out"
                 style={{ transform: `translateX(-${currentSlide * 100}%)` }}
               >
                 {sliderProducts.map((product) => (
                   <div key={product.id} className="w-full flex-shrink-0 px-1">
-                    <div className="bg-white/10 backdrop-blur-sm rounded-2xl p-6 md:p-8 flex flex-col md:flex-row items-center gap-6 md:gap-10 border border-white/10">
+                    <div className="bg-white/10 backdrop-blur-sm rounded-xl sm:rounded-2xl p-4 sm:p-6 md:p-8 flex flex-col md:flex-row items-center gap-4 sm:gap-6 md:gap-10 border border-white/10">
                       {/* Product Image */}
-                      <div className="w-48 h-48 md:w-56 md:h-56 flex-shrink-0 relative">
+                      <div className="w-32 h-32 sm:w-40 sm:h-40 md:w-56 md:h-56 flex-shrink-0 relative">
                         <img 
                           src={product.image_url || '/placeholder.png'} 
                           alt={product.name}
                           className="w-full h-full object-contain"
                         />
                         {/* Discount Badge */}
-                        <div className="absolute -top-2 -right-2 bg-gradient-to-r from-red-500 to-orange-500 text-white px-3 py-1.5 rounded-full text-sm font-bold shadow-lg flex items-center gap-1">
-                          <TrendingDown className="w-4 h-4" />
+                        <div className="absolute -top-2 -right-2 bg-gradient-to-r from-red-500 to-orange-500 text-white px-2 py-1 sm:px-3 sm:py-1.5 rounded-full text-xs sm:text-sm font-bold shadow-lg flex items-center gap-1">
+                          <TrendingDown className="w-3 h-3 sm:w-4 sm:h-4" />
                           {product.discount}% OFF
                         </div>
                       </div>
@@ -175,7 +175,7 @@ export default function Home() {
                       {/* Product Info */}
                       <div className="text-center md:text-left flex-1">
                         <div className="flex flex-wrap items-center gap-2 justify-center md:justify-start">
-                          <span className="text-xs text-blue-200 uppercase tracking-wider bg-white/10 px-3 py-1 rounded-full">
+                          <span className="text-xs text-blue-200 uppercase tracking-wider bg-white/10 px-2 py-1 sm:px-3 sm:py-1 rounded-full">
                             {product.category}
                           </span>
                           <span className="text-xs text-yellow-300 flex items-center gap-1">
@@ -184,42 +184,42 @@ export default function Home() {
                           </span>
                         </div>
                         
-                        <h3 className="text-2xl md:text-3xl font-bold mt-2">{product.name}</h3>
-                        <p className="text-blue-100 text-sm mt-1 max-w-md mx-auto md:mx-0 line-clamp-2">
+                        <h3 className="text-lg sm:text-xl md:text-3xl font-bold mt-2">{product.name}</h3>
+                        <p className="text-blue-100 text-xs sm:text-sm mt-1 max-w-md mx-auto md:mx-0 line-clamp-2">
                           {product.description}
                         </p>
 
                         {/* Price */}
-                        <div className="flex items-center justify-center md:justify-start gap-4 mt-3">
-                          <span className="text-3xl md:text-4xl font-bold text-white">
+                        <div className="flex flex-wrap items-center justify-center md:justify-start gap-2 sm:gap-4 mt-3">
+                          <span className="text-2xl sm:text-3xl md:text-4xl font-bold text-white">
                             R{product.price.toFixed(2)}
                           </span>
-                          <span className="text-sm text-gray-400 line-through">
+                          <span className="text-xs sm:text-sm text-gray-400 line-through">
                             R{product.originalPrice.toFixed(2)}
                           </span>
-                          <span className="bg-green-500/30 text-green-300 px-2 py-0.5 rounded-full text-sm font-semibold">
+                          <span className="bg-green-500/30 text-green-300 px-2 py-0.5 rounded-full text-xs font-semibold">
                             Save R{(product.originalPrice - product.price).toFixed(2)}
                           </span>
                         </div>
 
                         {/* Stock Status */}
                         <div className="flex items-center gap-4 mt-3 justify-center md:justify-start">
-                          <span className={`text-sm ${product.stock_quantity > 0 ? 'text-green-300' : 'text-red-300'}`}>
+                          <span className={`text-xs sm:text-sm ${product.stock_quantity > 0 ? 'text-green-300' : 'text-red-300'}`}>
                             {product.stock_quantity > 0 ? `✅ ${product.stock_quantity} in stock` : '❌ Out of Stock'}
                           </span>
                         </div>
 
                         {/* Buttons */}
-                        <div className="flex flex-wrap gap-3 mt-4 justify-center md:justify-start">
+                        <div className="flex flex-wrap gap-2 sm:gap-3 mt-4 justify-center md:justify-start">
                           <Link 
                             href={`/product/${product.id}`}
-                            className="px-6 py-2.5 bg-white/20 text-white rounded-lg hover:bg-white/30 transition font-medium backdrop-blur-sm border border-white/20"
+                            className="px-4 py-2 sm:px-6 sm:py-2.5 bg-white/20 text-white rounded-lg hover:bg-white/30 transition font-medium backdrop-blur-sm border border-white/20 text-sm sm:text-base"
                           >
                             View Details
                           </Link>
                           <button 
                             onClick={() => addToCart(product)}
-                            className="px-6 py-2.5 bg-white text-blue-600 rounded-lg hover:bg-gray-100 transition font-semibold"
+                            className="px-4 py-2 sm:px-6 sm:py-2.5 bg-white text-blue-600 rounded-lg hover:bg-gray-100 transition font-semibold text-sm sm:text-base"
                             disabled={product.stock_quantity === 0}
                           >
                             {product.stock_quantity > 0 ? '🛒 Add to Cart' : 'Out of Stock'}
@@ -233,13 +233,13 @@ export default function Home() {
             </div>
 
             {/* Slide Indicators */}
-            <div className="flex justify-center gap-2 mt-6">
+            <div className="flex justify-center gap-2 mt-4 sm:mt-6">
               {sliderProducts.map((_, index) => (
                 <button
                   key={index}
                   onClick={() => goToSlide(index)}
                   className={`h-1 rounded-full transition-all duration-300 ${
-                    currentSlide === index ? 'bg-white w-8' : 'bg-white/40 w-4 hover:bg-white/60'
+                    currentSlide === index ? 'bg-white w-6 sm:w-8' : 'bg-white/40 w-3 sm:w-4 hover:bg-white/60'
                   }`}
                 />
               ))}
@@ -247,15 +247,15 @@ export default function Home() {
           </div>
         </section>
 
-        {/* Featured Products Grid - Different products */}
-        <section className="py-16 bg-gray-50">
-          <div className="max-w-7xl mx-auto px-4">
-            <div className="flex justify-between items-center mb-8">
+        {/* Featured Products Grid - Mobile Optimized */}
+        <section className="py-8 sm:py-12 md:py-16 bg-gray-50">
+          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-2 mb-4 sm:mb-8">
               <div>
-                <h2 className="text-2xl md:text-3xl font-bold text-gray-800">Featured Products</h2>
-                <p className="text-gray-500 mt-1">Browse our collection</p>
+                <h2 className="text-xl sm:text-2xl md:text-3xl font-bold text-gray-800">Featured Products</h2>
+                <p className="text-sm text-gray-500 mt-1">Browse our collection</p>
               </div>
-              <Link href="/products" className="text-blue-600 hover:text-blue-700 font-medium hover:underline">
+              <Link href="/products" className="text-sm text-blue-600 hover:text-blue-700 font-medium hover:underline">
                 View All →
               </Link>
             </div>
@@ -263,7 +263,7 @@ export default function Home() {
             {featuredProducts.length === 0 ? (
               <div className="text-center py-12 text-gray-500">No products available</div>
             ) : (
-              <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
+              <div className="grid grid-cols-1 xs:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4 sm:gap-6">
                 {featuredProducts.map((product) => (
                   <div 
                     key={product.id} 
@@ -288,25 +288,25 @@ export default function Home() {
                         )}
                       </div>
                     </Link>
-                    <div className="p-4">
+                    <div className="p-3 sm:p-4">
                       <span className="text-xs text-gray-500 uppercase tracking-wider font-medium">
                         {product.category}
                       </span>
                       <Link href={`/product/${product.id}`}>
-                        <h3 className="font-semibold text-gray-800 hover:text-blue-600 transition-colors mt-1 line-clamp-1">
+                        <h3 className="font-semibold text-gray-800 hover:text-blue-600 transition-colors mt-1 line-clamp-1 text-sm sm:text-base">
                           {product.name}
                         </h3>
                       </Link>
-                      <p className="text-sm text-gray-500 line-clamp-2 mt-1 h-10">
+                      <p className="text-xs sm:text-sm text-gray-500 line-clamp-2 mt-1 h-8 sm:h-10">
                         {product.description}
                       </p>
-                      <div className="flex items-center justify-between mt-3">
-                        <span className="text-xl font-bold text-blue-600">
+                      <div className="flex flex-col xs:flex-row items-start xs:items-center justify-between gap-2 mt-3">
+                        <span className="text-lg sm:text-xl font-bold text-blue-600">
                           R{product.price.toFixed(2)}
                         </span>
                         <button 
                           onClick={() => addToCart(product)}
-                          className={`px-4 py-2 text-white text-sm rounded-lg transition-colors font-medium ${
+                          className={`w-full xs:w-auto px-3 py-1.5 sm:px-4 sm:py-2 text-white text-xs sm:text-sm rounded-lg transition-colors font-medium ${
                             product.stock_quantity > 0 
                               ? 'bg-green-500 hover:bg-green-600' 
                               : 'bg-gray-400 cursor-not-allowed'

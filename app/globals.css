@@ -1,1 +1,73 @@
-@import "tailwindcss";
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  /* Reset and base styles */
+  * {
+    @apply border-border;
+  }
+  
+  html {
+    @apply scroll-smooth antialiased;
+    -webkit-text-size-adjust: 100%;
+  }
+  
+  body {
+    @apply bg-gray-50 text-gray-900;
+    font-size: 16px;
+    line-height: 1.5;
+  }
+  
+  /* Make everything responsive */
+  img, video, iframe {
+    max-width: 100%;
+    height: auto;
+  }
+  
+  /* Better touch targets on mobile */
+  button, a {
+    touch-action: manipulation;
+  }
+}
+
+@layer components {
+  /* Responsive container */
+  .container-custom {
+    @apply w-full max-w-7xl mx-auto px-4 sm:px-6 lg:px-8;
+  }
+  
+  /* Responsive text sizes */
+  .heading-1 {
+    @apply text-2xl sm:text-3xl md:text-4xl lg:text-5xl font-bold;
+  }
+  
+  .heading-2 {
+    @apply text-xl sm:text-2xl md:text-3xl font-bold;
+  }
+  
+  .heading-3 {
+    @apply text-lg sm:text-xl font-semibold;
+  }
+  
+  /* Card with better mobile spacing */
+  .card-responsive {
+    @apply bg-white rounded-xl p-4 sm:p-6 shadow-sm border border-gray-100;
+  }
+  
+  /* Grid responsive */
+  .grid-responsive {
+    @apply grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4 sm:gap-6;
+  }
+}
+
+@layer utilities {
+  /* Hide scrollbar but keep functionality */
+  .scrollbar-hide::-webkit-scrollbar {
+    display: none;
+  }
+  .scrollbar-hide {
+    -ms-overflow-style: none;
+    scrollbar-width: none;
+  }
+}

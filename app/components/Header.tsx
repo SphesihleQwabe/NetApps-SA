@@ -6,6 +6,7 @@ import { useRouter } from 'next/navigation'
 import { createClient } from '../../lib/supabase/client'
 import { useCart } from '../context/CartContext'
 import Image from 'next/image'
+import { Menu, X } from 'lucide-react'
 
 export default function Header() {
   const router = useRouter()
@@ -14,6 +15,7 @@ export default function Header() {
   const [user, setUser] = useState<any>(null)
   const [isAdmin, setIsAdmin] = useState(false)
   const [isScrolled, setIsScrolled] = useState(false)
+  const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false)
 
   useEffect(() => {
     const checkUser = async () => {
@@ -79,7 +81,7 @@ export default function Header() {
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex items-center justify-between h-16 lg:h-20">
           {/* Logo */}
-          <Link href="/" className="flex items-center gap-3 group">
+          <Link href="/" className="flex items-center gap-3 group shrink-0">
             <div className="relative w-10 h-10 lg:w-12 lg:h-12">
               <Image
                 src="/images/products/logo.jpg"
@@ -99,7 +101,7 @@ export default function Header() {
             </div>
           </Link>
 
-          {/* Navigation - Added Contact */}
+          {/* Desktop Navigation */}
           <nav className="hidden lg:flex items-center gap-1">
             <Link href="/" className="px-4 py-2 text-sm font-medium text-gray-600 hover:text-blue-600 hover:bg-blue-50 rounded-lg transition-all">
               Home
@@ -139,9 +141,17 @@ export default function Header() {
               )}
             </Link>
 
+            {/* Mobile Menu Button */}
+            <button 
+              onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
+              className="lg:hidden p-2 rounded-lg hover:bg-gray-100 transition"
+            >
+              {isMobileMenuOpen ? <X className="w-6 h-6" /> : <Menu className="w-6 h-6" />}
+            </button>
+
             {/* User */}
             {user ? (
-              <div className="flex items-center gap-2 sm:gap-3">
+              <div className="hidden sm:flex items-center gap-2 sm:gap-3">
                 <div className="flex items-center gap-2.5 bg-gray-50 hover:bg-gray-100 rounded-xl px-3 py-2 transition-all">
                   <div className="w-8 h-8 lg:w-9 lg:h-9 bg-gradient-to-br from-blue-600 to-green-500 rounded-full flex items-center justify-center text-white text-sm font-semibold shadow-sm">
                     {user.name?.charAt(0) || 'U'}
@@ -158,7 +168,7 @@ export default function Header() {
                 </button>
               </div>
             ) : (
-              <div className="flex items-center gap-2">
+              <div className="hidden sm:flex items-center gap-2">
                 <Link href="/login">
                   <button className="px-4 py-2 lg:px-5 lg:py-2.5 bg-gradient-to-r from-blue-600 to-blue-700 text-white text-sm font-medium rounded-xl hover:shadow-lg hover:shadow-blue-500/25 transition-all hover:scale-[1.02]">
                     Sign In
@@ -173,6 +183,63 @@ export default function Header() {
             )}
           </div>
         </div>
+
+        {/* 🔥 MOBILE MENU */}
+        {isMobileMenuOpen && (
+          <div className="lg:hidden py-4 border-t border-gray-100 bg-white">
+            <nav className="flex flex-col space-y-1">
+              <Link href="/" className="flex items-center gap-3 px-3 py-3 rounded-lg hover:bg-gray-50 transition" onClick={() => setIsMobileMenuOpen(false)}>
+                <span className="text-gray-600">🏠</span>
+                <span className="font-medium text-gray-800">Home</span>
+              </Link>
+              <Link href="/products" className="flex items-center gap-3 px-3 py-3 rounded-lg hover:bg-gray-50 transition" onClick={() => setIsMobileMenuOpen(false)}>
+                <span className="text-gray-600">📦</span>
+                <span className="font-medium text-gray-800">Products</span>
+              </Link>
+              <Link href="/orders" className="flex items-center gap-3 px-3 py-3 rounded-lg hover:bg-gray-50 transition" onClick={() => setIsMobileMenuOpen(false)}>
+                <span className="text-gray-600">📋</span>
+                <span className="font-medium text-gray-800">Orders</span>
+              </Link>
+              <Link href="/contact" className="flex items-center gap-3 px-3 py-3 rounded-lg hover:bg-gray-50 transition" onClick={() => setIsMobileMenuOpen(false)}>
+                <span className="text-gray-600">💬</span>
+                <span className="font-medium text-gray-800">Message</span>
+              </Link>
+              {user && (
+                <Link href={isAdmin ? "/admin" : "/dashboard"} className="flex items-center gap-3 px-3 py-3 rounded-lg hover:bg-gray-50 transition" onClick={() => setIsMobileMenuOpen(false)}>
+                  <span className="text-gray-600">👤</span>
+                  <span className="font-medium text-gray-800">Account</span>
+                </Link>
+              )}
+              
+              {/* Mobile Auth Buttons */}
+              {user ? (
+                <button
+                  onClick={() => {
+                    handleLogout()
+                    setIsMobileMenuOpen(false)
+                  }}
+                  className="flex items-center gap-3 px-3 py-3 rounded-lg hover:bg-red-50 transition text-red-600"
+                >
+                  <span>🚪</span>
+                  <span className="font-medium">Sign Out</span>
+                </button>
+              ) : (
+                <div className="flex flex-col gap-2 pt-2 border-t border-gray-100">
+                  <Link href="/login" onClick={() => setIsMobileMenuOpen(false)}>
+                    <button className="w-full py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition font-medium">
+                      Sign In
+                    </button>
+                  </Link>
+                  <Link href="/register" onClick={() => setIsMobileMenuOpen(false)}>
+                    <button className="w-full py-3 border border-blue-600 text-blue-600 rounded-lg hover:bg-blue-50 transition font-medium">
+                      Register
+                    </button>
+                  </Link>
+                </div>
+              )}
+            </nav>
+          </div>
+        )}
       </div>
     </header>
   )
