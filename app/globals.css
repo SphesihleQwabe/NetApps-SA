@@ -4,65 +4,63 @@
 
 @layer base {
   html {
-    @apply scroll-smooth antialiased;
+    scroll-behavior: smooth;
     -webkit-text-size-adjust: 100%;
   }
   
   body {
-    @apply bg-gray-50 text-gray-900;
+    background-color: #f9fafb;
+    color: #111827;
     font-size: 16px;
     line-height: 1.5;
   }
   
-  /* Fix for border-border error - use real border color instead */
-  * {
-    @apply border-gray-200;
-  }
-  
-  /* Make everything responsive */
   img, video, iframe {
     max-width: 100%;
     height: auto;
   }
-  
-  /* Better touch targets on mobile */
-  button, a {
-    touch-action: manipulation;
-  }
 }
 
 @layer components {
-  /* Responsive container */
   .container-custom {
-    @apply w-full max-w-7xl mx-auto px-4 sm:px-6 lg:px-8;
+    width: 100%;
+    max-width: 1280px;
+    margin-left: auto;
+    margin-right: auto;
+    padding-left: 1rem;
+    padding-right: 1rem;
   }
   
-  /* Responsive text sizes */
-  .heading-1 {
-    @apply text-2xl sm:text-3xl md:text-4xl lg:text-5xl font-bold;
+  @media (min-width: 640px) {
+    .container-custom {
+      padding-left: 1.5rem;
+      padding-right: 1.5rem;
+    }
   }
   
-  .heading-2 {
-    @apply text-xl sm:text-2xl md:text-3xl font-bold;
+  @media (min-width: 1024px) {
+    .container-custom {
+      padding-left: 2rem;
+      padding-right: 2rem;
+    }
   }
   
-  .heading-3 {
-    @apply text-lg sm:text-xl font-semibold;
-  }
-  
-  /* Card with better mobile spacing */
   .card-responsive {
-    @apply bg-white rounded-xl p-4 sm:p-6 shadow-sm border border-gray-100;
+    background-color: white;
+    border-radius: 0.75rem;
+    padding: 1rem;
+    box-shadow: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
+    border: 1px solid #f3f4f6;
   }
   
-  /* Grid responsive */
-  .grid-responsive {
-    @apply grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4 sm:gap-6;
+  @media (min-width: 640px) {
+    .card-responsive {
+      padding: 1.5rem;
+    }
   }
 }
 
 @layer utilities {
-  /* Hide scrollbar but keep functionality */
   .scrollbar-hide::-webkit-scrollbar {
     display: none;
   }
