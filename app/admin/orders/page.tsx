@@ -75,15 +75,19 @@ export default function AdminOrders() {
     setShowDetails(true)
   }
 
-  // 🔥 FIXED: Auto-generate tracking number when status changes to "processing"
+  // 🔥 FIXED: Auto-generate tracking on BOTH "processing" AND "shipped"
   const updateOrderStatus = async (orderId: string, newStatus: string) => {
     setUpdating(true)
     
     let trackingNumber = null
-    if (newStatus === 'processing') {
-      const timestamp = Date.now().toString().slice(-6)
-      const random = Math.floor(Math.random() * 1000).toString().padStart(3, '0')
-      trackingNumber = `TC-${timestamp}${random}`
+    if (newStatus === 'processing' || newStatus === 'shipped') {
+      // Only generate if no tracking number exists yet
+      const currentOrder = orders.find(o => o.id === orderId)
+      if (!currentOrder?.tracking_number) {
+        const timestamp = Date.now().toString().slice(-6)
+        const random = Math.floor(Math.random() * 1000).toString().padStart(3, '0')
+        trackingNumber = `TC-${timestamp}${random}`
+      }
     }
     
     const updateData: any = { status: newStatus }
@@ -99,7 +103,7 @@ export default function AdminOrders() {
     if (!error) {
       setToast({ 
         message: trackingNumber 
-          ? `✅ Order processing! Tracking: ${trackingNumber}` 
+          ? `✅ Tracking: ${trackingNumber}` 
           : `Order status updated to ${newStatus}`, 
         type: 'success' 
       })
@@ -352,13 +356,13 @@ export default function AdminOrders() {
                   </select>
                 </div>
 
-                {/* 🔥 FIXED: Tracking Display - Shows auto-generated tracking */}
+                {/* 🔥 Tracking Display - Shows auto-generated tracking */}
                 <div className="flex items-center gap-2">
                   <span className="text-sm font-medium text-gray-600">Tracking:</span>
                   {selectedOrder.tracking_number ? (
                     <span className="text-sm font-semibold text-blue-600">{selectedOrder.tracking_number}</span>
                   ) : (
-                    <span className="text-sm text-gray-400">Will be generated when order is processed</span>
+                    <span className="text-sm text-gray-400">Will be generated when order is processed or shipped</span>
                   )}
                   <button onClick={() => setEditingTracking(true)} className="p-1 text-blue-600 hover:bg-blue-50 rounded-lg">
                     <Edit size={16} />
