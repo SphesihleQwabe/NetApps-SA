@@ -9,6 +9,7 @@ import {
   Package, User, Mail, MapPin,
   Edit, Save, X, CreditCard
 } from 'lucide-react'
+import OrderTimeline from '../../components/OrderTimeline'
 
 interface Order {
   id: string
@@ -476,6 +477,11 @@ export default function AdminOrders() {
                     <span className="text-blue-600">R{selectedOrder.total.toFixed(2)}</span>
                   </div>
                 </div>
+              </div>
+
+              {/* ✅ ORDER TIMELINE */}
+              <div className="border-t border-gray-100 pt-4">
+                <OrderTimeline orderId={selectedOrder.id} />
               </div>
 
               <div className="flex flex-wrap gap-3 pt-4 border-t border-gray-100">

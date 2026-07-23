@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from 'react'
 import { createClient } from '../../lib/supabase/client'
-import { CheckCircle, Clock, Truck, Package, CreditCard, XCircle, Edit, MapPin, Mail } from 'lucide-react'
+import { CheckCircle, Clock, Truck, Package, CreditCard } from 'lucide-react'
 
 interface Activity {
   id: string
@@ -38,11 +38,8 @@ export default function OrderTimeline({ orderId }: { orderId: string }) {
     switch(action) {
       case 'created': return <Package className="w-5 h-5 text-blue-500" />
       case 'payment_updated': return <CreditCard className="w-5 h-5 text-green-500" />
-      case 'status_update': 
-        return <Clock className="w-5 h-5 text-yellow-500" />
+      case 'status_update': return <Clock className="w-5 h-5 text-yellow-500" />
       case 'tracking_updated': return <Truck className="w-5 h-5 text-purple-500" />
-      case 'shipped': return <Truck className="w-5 h-5 text-purple-500" />
-      case 'delivered': return <CheckCircle className="w-5 h-5 text-green-500" />
       default: return <Clock className="w-5 h-5 text-gray-400" />
     }
   }
@@ -86,7 +83,7 @@ export default function OrderTimeline({ orderId }: { orderId: string }) {
         {/* Timeline line */}
         <div className="absolute left-2.5 top-0 bottom-0 w-0.5 bg-gray-200"></div>
         
-        {activities.map((activity, index) => (
+        {activities.map((activity) => (
           <div key={activity.id} className="relative pl-8 pb-4 last:pb-0">
             {/* Timeline dot */}
             <div className="absolute left-0 top-1 w-5 h-5 rounded-full bg-white border-2 border-gray-200 flex items-center justify-center">
