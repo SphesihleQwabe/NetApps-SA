@@ -75,19 +75,19 @@ export default function AdminOrders() {
     setShowDetails(true)
   }
 
-  // 🔥 FIXED: Auto-generate tracking on BOTH "processing" AND "shipped"
+  // 🔥 UPDATED: Auto-generate tracking AND log status changes
   const updateOrderStatus = async (orderId: string, newStatus: string) => {
     setUpdating(true)
     
+    // Get current order for old status
+    const currentOrder = orders.find(o => o.id === orderId)
+    const oldStatus = currentOrder?.status || 'pending'
+    
     let trackingNumber = null
-    if (newStatus === 'processing' || newStatus === 'shipped') {
-      // Only generate if no tracking number exists yet
-      const currentOrder = orders.find(o => o.id === orderId)
-      if (!currentOrder?.tracking_number) {
-        const timestamp = Date.now().toString().slice(-6)
-        const random = Math.floor(Math.random() * 1000).toString().padStart(3, '0')
-        trackingNumber = `TC-${timestamp}${random}`
-      }
+    if ((newStatus === 'processing' || newStatus === 'shipped') && !currentOrder?.tracking_number) {
+      const timestamp = Date.now().toString().slice(-6)
+      const random = Math.floor(Math.random() * 1000).toString().padStart(3, '0')
+      trackingNumber = `TC-${timestamp}${random}`
     }
     
     const updateData: any = { status: newStatus }
@@ -101,6 +101,18 @@ export default function AdminOrders() {
       .eq('id', orderId)
 
     if (!error) {
+      // ✅ Log status change
+      await supabase
+        .from('order_activities')
+        .insert({
+          order_id: orderId,
+          action: 'status_update',
+          description: `Order status changed from ${oldStatus} to ${newStatus}`,
+          status_from: oldStatus,
+          status_to: newStatus,
+          metadata: trackingNumber ? { tracking_number: trackingNumber } : null
+        })
+
       setToast({ 
         message: trackingNumber 
           ? `✅ Tracking: ${trackingNumber}` 
@@ -130,6 +142,16 @@ export default function AdminOrders() {
       .eq('id', orderId)
 
     if (!error) {
+      // ✅ Log payment status change
+      await supabase
+        .from('order_activities')
+        .insert({
+          order_id: orderId,
+          action: 'payment_updated',
+          description: `Payment status changed to ${newStatus}`,
+          status_to: newStatus
+        })
+
       setToast({ message: `Payment status updated to ${newStatus}`, type: 'success' })
       loadOrders()
       if (selectedOrder) {
@@ -150,6 +172,16 @@ export default function AdminOrders() {
       .eq('id', selectedOrder.id)
 
     if (!error) {
+      // ✅ Log tracking number update
+      await supabase
+        .from('order_activities')
+        .insert({
+          order_id: selectedOrder.id,
+          action: 'tracking_updated',
+          description: `Tracking number updated to ${trackingNumber}`,
+          metadata: { tracking_number: trackingNumber }
+        })
+
       setToast({ message: 'Tracking number updated', type: 'success' })
       setEditingTracking(false)
       loadOrders()
@@ -356,7 +388,7 @@ export default function AdminOrders() {
                   </select>
                 </div>
 
-                {/* 🔥 Tracking Display - Shows auto-generated tracking */}
+                {/* Tracking Display */}
                 <div className="flex items-center gap-2">
                   <span className="text-sm font-medium text-gray-600">Tracking:</span>
                   {selectedOrder.tracking_number ? (
