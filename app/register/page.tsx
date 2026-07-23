@@ -100,7 +100,6 @@ export default function RegisterPage() {
       let profileError = null
 
       if (existingUser) {
-        // Update existing user
         const { error: updateError } = await supabase
           .from('users')
           .update({
@@ -115,7 +114,6 @@ export default function RegisterPage() {
           .eq('id', existingUser.id)
         profileError = updateError
       } else {
-        // Insert new user
         const { error: insertError } = await supabase
           .from('users')
           .insert({
@@ -155,26 +153,12 @@ export default function RegisterPage() {
         console.error('Welcome email error:', emailError)
       }
 
-      // 4. Auto-login the user
-      const { error: signInError } = await supabase.auth.signInWithPassword({
-        email: form.email,
-        password: form.password
-      })
-
-      if (signInError) {
-        console.error('Auto-login error:', signInError)
-        // Still redirect to home even if auto-login fails
-        router.push('/')
-        return
-      }
-
-      // 5. ✅ Redirect to HOME page (not dashboard)
-      setMessage('✅ Registration successful! Welcome to NetApps Development! 🎉')
+      // 4. ✅ REDIRECT TO LOGIN PAGE (NOT auto-login)
+      setMessage('✅ Registration successful! Please check your email and login.')
       
-      // Force redirect to home page
       setTimeout(() => {
-        router.push('/')
-      }, 1500)
+        router.push('/login')
+      }, 2000)
 
     } catch (error) {
       setError('Registration failed. Please try again.')
@@ -211,9 +195,9 @@ export default function RegisterPage() {
 
           {message && (
             <div className="bg-green-50 border border-green-200 text-green-700 px-4 py-3 rounded-lg mb-4 flex items-start gap-2">
-              <span className="text-xl">🎉</span>
+              <span className="text-xl">✅</span>
               <div>
-                <p className="font-semibold">Welcome!</p>
+                <p className="font-semibold">Registration Successful!</p>
                 <p className="text-sm">{message}</p>
               </div>
             </div>
