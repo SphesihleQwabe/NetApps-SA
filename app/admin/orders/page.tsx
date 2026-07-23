@@ -75,18 +75,41 @@ export default function AdminOrders() {
     setShowDetails(true)
   }
 
+  // 🔥 FIXED: Auto-generate tracking number when status changes to "processing"
   const updateOrderStatus = async (orderId: string, newStatus: string) => {
     setUpdating(true)
+    
+    let trackingNumber = null
+    if (newStatus === 'processing') {
+      const timestamp = Date.now().toString().slice(-6)
+      const random = Math.floor(Math.random() * 1000).toString().padStart(3, '0')
+      trackingNumber = `TC-${timestamp}${random}`
+    }
+    
+    const updateData: any = { status: newStatus }
+    if (trackingNumber) {
+      updateData.tracking_number = trackingNumber
+    }
+    
     const { error } = await supabase
       .from('orders')
-      .update({ status: newStatus })
+      .update(updateData)
       .eq('id', orderId)
 
     if (!error) {
-      setToast({ message: `Order status updated to ${newStatus}`, type: 'success' })
+      setToast({ 
+        message: trackingNumber 
+          ? `✅ Order processing! Tracking: ${trackingNumber}` 
+          : `Order status updated to ${newStatus}`, 
+        type: 'success' 
+      })
       loadOrders()
       if (selectedOrder) {
-        setSelectedOrder({ ...selectedOrder, status: newStatus })
+        setSelectedOrder({ 
+          ...selectedOrder, 
+          status: newStatus, 
+          tracking_number: trackingNumber || selectedOrder.tracking_number 
+        })
       }
     } else {
       setToast({ message: 'Failed to update order status', type: 'error' })
@@ -94,7 +117,7 @@ export default function AdminOrders() {
     setUpdating(false)
   }
 
-  // 🔥 NEW: Update Payment Status
+  // Update Payment Status
   const updatePaymentStatus = async (orderId: string, newStatus: string) => {
     setUpdating(true)
     const { error } = await supabase
@@ -311,7 +334,7 @@ export default function AdminOrders() {
                   </select>
                 </div>
 
-                {/* 🔥 NEW: Payment Status Update */}
+                {/* Payment Status Update */}
                 <div className="flex items-center gap-2">
                   <span className="text-sm font-medium text-gray-600">Payment:</span>
                   <select
@@ -329,35 +352,40 @@ export default function AdminOrders() {
                   </select>
                 </div>
 
-                {/* Tracking */}
+                {/* 🔥 FIXED: Tracking Display - Shows auto-generated tracking */}
                 <div className="flex items-center gap-2">
                   <span className="text-sm font-medium text-gray-600">Tracking:</span>
-                  {editingTracking ? (
-                    <div className="flex items-center gap-2">
-                      <input
-                        type="text"
-                        value={trackingNumber}
-                        onChange={(e) => setTrackingNumber(e.target.value)}
-                        className="px-3 py-1.5 border border-gray-300 rounded-lg text-sm focus:ring-2 focus:ring-blue-500"
-                        placeholder="Enter tracking number"
-                      />
-                      <button onClick={updateTrackingNumber} className="p-1.5 text-green-600 hover:bg-green-50 rounded-lg">
-                        <Save size={18} />
-                      </button>
-                      <button onClick={() => setEditingTracking(false)} className="p-1.5 text-red-600 hover:bg-red-50 rounded-lg">
-                        <X size={18} />
-                      </button>
-                    </div>
+                  {selectedOrder.tracking_number ? (
+                    <span className="text-sm font-semibold text-blue-600">{selectedOrder.tracking_number}</span>
                   ) : (
-                    <div className="flex items-center gap-2">
-                      <span className="text-sm text-gray-700">{selectedOrder.tracking_number || 'Not set'}</span>
-                      <button onClick={() => setEditingTracking(true)} className="p-1 text-blue-600 hover:bg-blue-50 rounded-lg">
-                        <Edit size={16} />
-                      </button>
-                    </div>
+                    <span className="text-sm text-gray-400">Will be generated when order is processed</span>
                   )}
+                  <button onClick={() => setEditingTracking(true)} className="p-1 text-blue-600 hover:bg-blue-50 rounded-lg">
+                    <Edit size={16} />
+                  </button>
                 </div>
               </div>
+
+              {/* Edit Tracking Modal */}
+              {editingTracking && (
+                <div className="bg-gray-50 rounded-lg p-4 border border-gray-200">
+                  <div className="flex items-center gap-3">
+                    <input
+                      type="text"
+                      value={trackingNumber}
+                      onChange={(e) => setTrackingNumber(e.target.value)}
+                      placeholder="Enter tracking number"
+                      className="flex-1 px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500"
+                    />
+                    <button onClick={updateTrackingNumber} className="px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 transition">
+                      <Save size={18} />
+                    </button>
+                    <button onClick={() => setEditingTracking(false)} className="px-4 py-2 bg-gray-200 text-gray-700 rounded-lg hover:bg-gray-300 transition">
+                      Cancel
+                    </button>
+                  </div>
+                </div>
+              )}
 
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <div className="bg-gray-50 rounded-lg p-4">
