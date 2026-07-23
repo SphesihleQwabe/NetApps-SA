@@ -89,6 +89,16 @@ export default function PayFastButton({
         throw new Error('Failed to create order')
       }
 
+      // ✅ Log order creation
+      await supabase
+        .from('order_activities')
+        .insert({
+          order_id: orderData.id,
+          action: 'created',
+          description: `Order #${orderNumber} was placed by ${firstName} ${lastName}`,
+          status_to: 'pending'
+        })
+
       // Save order items
       const orderItems = items.map(item => ({
         order_id: orderData.id,
@@ -104,7 +114,7 @@ export default function PayFastButton({
         .from('order_items')
         .insert(orderItems)
 
-      // 🔥 SAVE ORDER ID TO localStorage BEFORE REDIRECT
+      // SAVE ORDER ID TO localStorage BEFORE REDIRECT
       localStorage.setItem('pending_order_id', orderData.id)
       console.log('💾 Saved order ID to localStorage:', orderData.id)
 
