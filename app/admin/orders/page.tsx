@@ -7,7 +7,7 @@ import {
   Search, Eye, Truck, CheckCircle, XCircle, Clock, 
   Printer, Download, RefreshCw,
   Package, User, Mail, MapPin,
-  Edit, Save, X
+  Edit, Save, X, CreditCard
 } from 'lucide-react'
 
 interface Order {
@@ -90,6 +90,26 @@ export default function AdminOrders() {
       }
     } else {
       setToast({ message: 'Failed to update order status', type: 'error' })
+    }
+    setUpdating(false)
+  }
+
+  // 🔥 NEW: Update Payment Status
+  const updatePaymentStatus = async (orderId: string, newStatus: string) => {
+    setUpdating(true)
+    const { error } = await supabase
+      .from('orders')
+      .update({ payment_status: newStatus })
+      .eq('id', orderId)
+
+    if (!error) {
+      setToast({ message: `Payment status updated to ${newStatus}`, type: 'success' })
+      loadOrders()
+      if (selectedOrder) {
+        setSelectedOrder({ ...selectedOrder, payment_status: newStatus })
+      }
+    } else {
+      setToast({ message: 'Failed to update payment status', type: 'error' })
     }
     setUpdating(false)
   }
@@ -276,6 +296,7 @@ export default function AdminOrders() {
 
             <div className="p-6 space-y-6">
               <div className="flex flex-wrap gap-4 items-center">
+                {/* Order Status */}
                 <div className="flex items-center gap-2">
                   <span className="text-sm font-medium text-gray-600">Status:</span>
                   <select
@@ -290,6 +311,25 @@ export default function AdminOrders() {
                   </select>
                 </div>
 
+                {/* 🔥 NEW: Payment Status Update */}
+                <div className="flex items-center gap-2">
+                  <span className="text-sm font-medium text-gray-600">Payment:</span>
+                  <select
+                    value={selectedOrder.payment_status || 'pending'}
+                    onChange={(e) => updatePaymentStatus(selectedOrder.id, e.target.value)}
+                    disabled={updating}
+                    className={`px-3 py-1.5 border border-gray-300 rounded-lg text-sm focus:ring-2 focus:ring-blue-500 ${
+                      selectedOrder.payment_status === 'paid' ? 'bg-green-50 text-green-600' : 'bg-yellow-50 text-yellow-600'
+                    }`}
+                  >
+                    <option value="pending">Pending</option>
+                    <option value="paid">Paid</option>
+                    <option value="failed">Failed</option>
+                    <option value="refunded">Refunded</option>
+                  </select>
+                </div>
+
+                {/* Tracking */}
                 <div className="flex items-center gap-2">
                   <span className="text-sm font-medium text-gray-600">Tracking:</span>
                   {editingTracking ? (
