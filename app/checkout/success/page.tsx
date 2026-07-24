@@ -1,12 +1,13 @@
 'use client'
 
+import { Suspense } from 'react'
 import { useEffect, useState } from 'react'
 import { useSearchParams } from 'next/navigation'
 import Link from 'next/link'
 import { CheckCircle, Package, ArrowRight, Loader2, XCircle } from 'lucide-react'
 import { createClient } from '../../../lib/supabase/client'
 
-export default function PaymentSuccessPage() {
+function SuccessContent() {
   const searchParams = useSearchParams()
   const supabase = createClient()
   const [orderId, setOrderId] = useState<string | null>(null)
@@ -15,13 +16,11 @@ export default function PaymentSuccessPage() {
 
   useEffect(() => {
     async function handlePaymentSuccess() {
-      // Try to get order ID from URL
       let paymentId = searchParams.get('m_payment_id')
       
       console.log('🔍 URL params:', Object.fromEntries(searchParams.entries()))
       console.log('🔍 Payment ID from URL:', paymentId)
 
-      // If no payment ID in URL, try to get from localStorage
       if (!paymentId) {
         const savedOrderId = localStorage.getItem('pending_order_id')
         console.log('🔍 Order ID from localStorage:', savedOrderId)
@@ -41,7 +40,6 @@ export default function PaymentSuccessPage() {
       setOrderId(paymentId)
 
       try {
-        // Update order status to paid
         await supabase
           .from('orders')
           .update({
@@ -50,7 +48,6 @@ export default function PaymentSuccessPage() {
           })
           .eq('id', paymentId)
 
-        // Get order items
         const { data: orderItems } = await supabase
           .from('order_items')
           .select('*')
@@ -58,7 +55,6 @@ export default function PaymentSuccessPage() {
 
         console.log('📦 Order items:', orderItems)
 
-        // Deduct stock for each product
         for (const item of orderItems || []) {
           const { data: product } = await supabase
             .from('products')
@@ -166,5 +162,20 @@ export default function PaymentSuccessPage() {
         </div>
       </div>
     </div>
+  )
+}
+
+export default function PaymentSuccessPage() {
+  return (
+    <Suspense fallback={
+      <div className="max-w-2xl mx-auto py-12 px-4">
+        <div className="bg-white rounded-2xl shadow-lg border border-gray-100 p-8 text-center">
+          <Loader2 className="w-12 h-12 text-blue-600 animate-spin mx-auto mb-4" />
+          <h2 className="text-xl font-semibold text-gray-700">Loading...</h2>
+        </div>
+      </div>
+    }>
+      <SuccessContent />
+    </Suspense>
   )
 }
