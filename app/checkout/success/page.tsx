@@ -16,11 +16,13 @@ function SuccessContent() {
 
   useEffect(() => {
     async function handlePaymentSuccess() {
-      let paymentId = searchParams.get('m_payment_id')
+      console.log('🔍 All URL params:', Object.fromEntries(searchParams.entries()))
       
-      console.log('🔍 URL params:', Object.fromEntries(searchParams.entries()))
+      // 🔥 METHOD 1: Try to get payment ID from URL
+      let paymentId = searchParams.get('m_payment_id')
       console.log('🔍 Payment ID from URL:', paymentId)
 
+      // 🔥 METHOD 2: Try from localStorage
       if (!paymentId) {
         const savedOrderId = localStorage.getItem('pending_order_id')
         console.log('🔍 Order ID from localStorage:', savedOrderId)
@@ -28,6 +30,47 @@ function SuccessContent() {
         if (savedOrderId) {
           paymentId = savedOrderId
           localStorage.removeItem('pending_order_id')
+        }
+      }
+
+      // 🔥 METHOD 3: Try to get the email from URL
+      const email = searchParams.get('email')
+      console.log('🔍 Email from URL:', email)
+
+      // 🔥 METHOD 4: If still no ID, try to find the most recent pending order
+      if (!paymentId && email) {
+        console.log('🔍 Looking for recent order by email...')
+        const { data: recentOrders, error: findError } = await supabase
+          .from('orders')
+          .select('id, created_at')
+          .eq('email', email)
+          .order('created_at', { ascending: false })
+          .limit(1)
+
+        console.log('🔍 Recent orders found:', recentOrders)
+
+        if (recentOrders && recentOrders.length > 0) {
+          paymentId = recentOrders[0].id
+          console.log('🔍 Found order by email:', paymentId)
+        }
+      }
+
+      // 🔥 METHOD 5: Last resort - get the most recent order from today
+      if (!paymentId) {
+        console.log('🔍 Looking for any recent order...')
+        const today = new Date()
+        today.setHours(0, 0, 0, 0)
+        
+        const { data: recentOrders } = await supabase
+          .from('orders')
+          .select('id, created_at')
+          .gte('created_at', today.toISOString())
+          .order('created_at', { ascending: false })
+          .limit(1)
+
+        if (recentOrders && recentOrders.length > 0) {
+          paymentId = recentOrders[0].id
+          console.log('🔍 Found recent order by date:', paymentId)
         }
       }
 
@@ -40,7 +83,8 @@ function SuccessContent() {
       setOrderId(paymentId)
 
       try {
-        await supabase
+        // Update order status to paid
+        const { error: updateError } = await supabase
           .from('orders')
           .update({
             payment_status: 'paid',
@@ -48,6 +92,11 @@ function SuccessContent() {
           })
           .eq('id', paymentId)
 
+        if (updateError) {
+          console.error('❌ Error updating order:', updateError)
+        }
+
+        // Get order items
         const { data: orderItems } = await supabase
           .from('order_items')
           .select('*')
@@ -55,6 +104,7 @@ function SuccessContent() {
 
         console.log('📦 Order items:', orderItems)
 
+        // Deduct stock for each product
         for (const item of orderItems || []) {
           const { data: product } = await supabase
             .from('products')
